@@ -11,6 +11,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
     protected $_attributesFromConfig = array();
     protected $_attributesConfigurable = array();
     protected $_storeCategories = array();
+    protected $_excludedNotSalableProductsIds = array();
 
     protected function _construct() {
         $this->_init('profileolabs_shoppingflux/export_flux');
@@ -71,6 +72,9 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         return $product;
     }
 
+    /**
+     * @return Profileolabs_Shoppingflux_Model_Config
+     */
     public function getConfig() {
         return Mage::getSingleton('profileolabs_shoppingflux/config');
     }
@@ -173,6 +177,32 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         }
     }
 
+    /**
+     * @param int $storeId
+     * @return int[]
+     */
+    protected function _getExcludedNotSalableProductsIds($storeId)
+    {
+        if (!isset($this->_excludedNotSalableProductsIds[$storeId])) {
+            if ($seconds = $this->getConfig()->getNotSalableRetentionDuration($storeId)) {
+                $resource = $this->getResource();
+                $connection = $resource->getReadConnection();
+
+                $this->_excludedNotSalableProductsIds[$storeId] = $connection->fetchCol(
+                    $connection->select()
+                        ->from(
+                            $resource->getTable('profileolabs_shoppingflux/not_salable_product'),
+                            array('product_id')
+                        )
+                        ->where('UNIX_TIMESTAMP(not_salable_from) <= ?', time() - $seconds)
+                );
+            } else {
+                $this->_excludedNotSalableProductsIds[$storeId] = array();
+            }
+        }
+        return $this->_excludedNotSalableProductsIds[$storeId];
+    }
+
     public function productNeedUpdateForStore($productId, $storeId, $ignoreRelations = false) {
         $product = $this->_getProduct($productId, $storeId);
         if ($product && $product->getId()) {
@@ -220,8 +250,14 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             return false;
         }
 
-        if (!$this->getConfig()->isExportNotSalable() && !$product->isSalable()) {
-            return false;
+        $exportNotSalable = $this->getConfig()->isExportNotSalable();
+        $retainNotSalable = $this->getConfig()->isNotSalableRetentionEnabled();
+
+        if (!$product->isSalable()) {
+            if ((!$exportNotSalable && !$retainNotSalable)
+                || ($retainNotSalable && in_array($product->getId(), $this->_getExcludedNotSalableProductsIds($storeId)))) {
+                return false;
+            }
         }
 
         if ($product->getTypeId() == 'simple') {
@@ -478,7 +514,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
 
         //Varien_Profiler::stop("SF::Flux::getAdditionalAttributes");
         //Varien_Profiler::start("SF::Flux::addEntry1");
-        if (!isset($data['shipping_delay']) && empty($data['shipping_delay']))
+        if (!isset($data['shipping_delay']) || empty($data['shipping_delay']))
             $data['shipping_delay'] = $this->getConfig()->getConfigData('shoppingflux_export/general/default_shipping_delay');
 
 
@@ -809,8 +845,8 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
 
 
         $mediaUrl = Mage::getBaseUrl('media') . 'catalog/product';
-
         $i = 1;
+        $count = $this->getConfig()->getExportedImageCount();
 
         if ($product->getImage() != "" && $product->getImage() != 'no_selection') {
             $data["image-url-" . $i] = $mediaUrl . $product->getImage();
@@ -833,21 +869,14 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
 
                 $data["image-url-" . $i] = $product->getMediaConfig()->getMediaUrl($image['file']);
                 $data["image-label-" . $i] = $image['label'];
-                $i++;
-                if (($i - 6) == 0)
+                
+                if (($count !== false) && ($i++ >= $count)) {
                     break;
+                }
             }
         }
 
-
-        //Complet with empty nodes
-        for ($j = $i; $j < 6; $j++) {
-            $data["image-url-" . $i] = "";
-            $data["image-label-" . $i] = "";
-            $i++;
-        }
-        
-        if(!$data['image-url-1'] && $checkParentIfNone) {
+        if ((!isset($data['image-url-1']) || !$data['image-url-1']) && $checkParentIfNone) {
             $groupedParentsIds = Mage::getResourceSingleton('catalog/product_link')
                    ->getParentIdsByChild($product->getId(), Mage_Catalog_Model_Product_Link::LINK_TYPE_GROUPED);
             $parentId = current($groupedParentsIds);

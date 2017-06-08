@@ -87,7 +87,33 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object {
     public function isExportNotSalable($storeId = null) {
         return $this->getConfigFlag('shoppingflux_export/general/export_not_salable', $storeId);
     }
-    
+
+    /**
+     * @param int|null $storeId
+     * @return int|false
+     */
+    public function getNotSalableRetentionDuration($storeId = null)
+    {
+        $seconds = 0;
+
+        if (!$this->isExportSoldout($storeId) && !$this->isExportNotSalable($storeId)) {
+            if ($this->getConfigFlag('shoppingflux_export/general/enable_not_salable_retention', $storeId)) {
+                $hours = $this->getConfigData('shoppingflux_export/general/not_salable_retention_duration', $storeId);
+                $seconds = max(0, min((int) trim($hours), 168)) * 3600;
+            }
+        }
+
+        return ($seconds > 0 ? $seconds : false);
+    }
+
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isNotSalableRetentionEnabled($storeId = null)
+    {
+        return ($this->getNotSalableRetentionDuration($storeId) !== false);
+    }
  
     public function getVisibilitiesToExport($storeId = null) {
         return explode(',', $this->getConfigData('shoppingflux_export/general/export_visibility', $storeId));
@@ -226,6 +252,12 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object {
     
     public function useManageStock($storeId = null) {
         return $this->getConfigFlag('shoppingflux_export/general/use_manage_stock', $storeId);
+    }
+    
+    public function getExportedImageCount($storeId = null) {
+        $exportAll = $this->getConfigFlag('shoppingflux_export/general/export_all_images', $storeId);
+        $count = (int) $this->getConfigData('shoppingflux_export/general/exported_image_count', $storeId);
+        return (!$exportAll && ($count > 0) ? $count : false);
     }
 
     /** ORDERS * */
