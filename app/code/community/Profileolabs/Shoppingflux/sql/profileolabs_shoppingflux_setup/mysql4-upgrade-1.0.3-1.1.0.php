@@ -1,6 +1,6 @@
 <?php
 
-/* @var $installer Mage_Catalog_Model_Resource_Eav_Mysql4_Setup */
+/** @var Mage_Catalog_Model_Resource_Setup $installer */
 $installer = Mage::getResourceModel('catalog/setup', 'profileolabs_shoppingflux_setup');
 $installer->startSetup();
 
