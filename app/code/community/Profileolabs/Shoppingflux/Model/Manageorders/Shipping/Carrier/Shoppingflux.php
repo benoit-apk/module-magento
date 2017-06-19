@@ -40,7 +40,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Shipping_Carrier_Shoppingflux
             $taxClassId = $taxHelper->getShippingTaxClass(null);
             $dummyProduct->setTaxClassId($taxClassId);
 
-            if (is_null($percent) && $taxClassId) {
+            if (($percent === null) && $taxClassId) {
                 $request = $taxCalculationModel->getRateRequest(
                     $sfQuote->getShippingAddress(),
                     $sfQuote->getBillingAddress(),
@@ -52,7 +52,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Shipping_Carrier_Shoppingflux
                 $request->setCustomerClassId($sfQuote->getCustomerTaxClassId());
                 $percent = $taxCalculationModel->getRate($request);
 
-                if ($percent !== false || !is_null($percent)) {
+                if (($percent !== false) || ($percent !== null)) {
                     $shippingPrice = $shippingPrice - ($shippingPrice / (100 + $percent) * $percent);
                 }
             }

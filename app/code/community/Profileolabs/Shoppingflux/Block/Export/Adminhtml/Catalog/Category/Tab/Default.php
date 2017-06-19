@@ -46,7 +46,7 @@ class Profileolabs_Shoppingflux_Block_Export_Adminhtml_Catalog_Category_Tab_Defa
     {
         $products = $this->getRequest()->getPost('sf_selected_products');
 
-        if (is_null($products)) {
+        if ($products === null) {
             /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
             $collection = Mage::getResourceModel('catalog/product_collection');
             $collection->setStore($this->getRequest()->getParam('store'));
@@ -66,7 +66,7 @@ class Profileolabs_Shoppingflux_Block_Export_Adminhtml_Catalog_Category_Tab_Defa
     {
         $products = $this->getRequest()->getPost('selected_products');
 
-        if (is_null($products)) {
+        if ($products === null) {
             $products = array_keys($this->getCategory()->getProductsPosition());
         }
 
@@ -76,8 +76,6 @@ class Profileolabs_Shoppingflux_Block_Export_Adminhtml_Catalog_Category_Tab_Defa
     protected function _addColumnFilterToCollection($column)
     {
         /** @var Mage_Adminhtml_Block_Widget_Grid_Column $column */
-
-        $productsIds = array();
 
         if ($column->getId() === 'in_shoppingflux_category') {
             $productIds = $this->_getSelectedProducts();
@@ -92,6 +90,7 @@ class Profileolabs_Shoppingflux_Block_Export_Adminhtml_Catalog_Category_Tab_Defa
                 $productIds = array(0);
             }
         }
+
         if (!empty($productIds)) {
             if ($column->getFilter()->getValue()) {
                 $this->getCollection()->addFieldToFilter('entity_id', array('in' => $productIds));

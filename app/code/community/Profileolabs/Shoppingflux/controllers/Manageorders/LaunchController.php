@@ -45,6 +45,6 @@ class Profileolabs_Shoppingflux_Manageorders_LaunchController extends Mage_Core_
             'profileolabs_shoppingflux/manageorders_export_shipments_collection'
         );
 
-        $this->getResponse()->setBody('Count : ' . $shipmentCollection->count());
+        $this->getResponse()->setBody('Count : ' . $shipmentCollection->getSize());
     }
 }

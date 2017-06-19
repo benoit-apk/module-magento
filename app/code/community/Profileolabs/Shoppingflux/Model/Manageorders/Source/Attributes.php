@@ -40,7 +40,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Source_Attributes
      */
     public function toOptionArray()
     {
-        if (is_null($this->_attributes)) {
+        if ($this->_attributes === null) {
             $this->_attributes = array(array('value' => '', 'label' => ''));
 
             /** @var Mage_Customer_Model_Resource_Customer $customerResource */

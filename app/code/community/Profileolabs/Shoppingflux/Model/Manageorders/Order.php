@@ -93,9 +93,10 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
      */
     public function getConfig()
     {
-        if (is_null($this->_config)) {
+        if ($this->_config === null) {
             $this->_config = Mage::getSingleton('profileolabs_shoppingflux/config');
         }
+
         return $this->_config;
     }
 
@@ -136,10 +137,11 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
      */
     public function getProductModel()
     {
-        if (is_null($this->_productModel)) {
+        if ($this->_productModel === null) {
             $productModel = Mage::getModel('profileolabs_shoppingflux/manageorders_product');
             $this->_productModel = Mage::objects()->save($productModel);
         }
+
         return Mage::objects()->load($this->_productModel);
     }
 
@@ -149,16 +151,20 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
      */
     public function isAlreadyImported($shoppingfluxId)
     {
+        /** @var Mage_Sales_Model_Resource_Order_Collection $orders */
         $orders = Mage::getResourceModel('sales/order_collection');
         $orders->addAttributeToFilter('from_shoppingflux', 1);
         $orders->addAttributeToFilter('order_id_shoppingflux', $shoppingfluxId);
         $orders->addAttributeToSelect('increment_id');
 
-        if ($orders->count() > 0) {
+        if ($orders->getSize() > 0) {
+            $orders->setCurPage(1);
+            $orders->setPageSize(1);
             return $orders->getFirstItem();
         }
 
-        $config = new Mage_Core_Model_Config();
+        /** @var Mage_Core_Model_Config $config */
+        $config = Mage::getModel('core/config');
         $flagPath = Mage::getStoreConfig('shoppingflux/order_flags/order_' . $shoppingfluxId);
 
         if ($flagPath) {
@@ -226,7 +232,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                 $handledApiKeys[] = $apiKey;
                 $wsUri = $this->getConfig()->getWsUri();
 
-                /* @var $service Profileolabs_Shoppingflux_Model_Service */
+                /** @var $service Profileolabs_Shoppingflux_Model_Service */
                 $service = new Profileolabs_Shoppingflux_Model_Service($apiKey, $wsUri);
 
                 ini_set('memory_limit', $this->getConfig()->getMemoryLimit() . 'M');
@@ -243,7 +249,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
 
                 $nodes = $ordersResult->children();
 
-                if ($nodes && count($nodes) > 0) {
+                if ($nodes && (count($nodes) > 0)) {
                     foreach ($nodes as $childName => $child) {
                         $sfOrder = $this->getHelper()->asArray($child);
 
@@ -268,7 +274,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                 }
 
                 try {
-                    if ($this->_importedOrderCount > 0 || count($this->_importedOrders)) {
+                    if (($this->_importedOrderCount > 0) || !empty($this->_importedOrders)) {
                         $result = $service->sendValidOrders($this->_importedOrders);
 
                         foreach ($this->_importedOrders as $importedOrder) {
@@ -292,6 +298,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                             if ($result->error) {
                                 Mage::throwException($result->error);
                             }
+
                             $this->_sentOrdersResult = $result->status;
                         } else {
                             $this->getHelper()->log('Error in order ids validated');
@@ -331,7 +338,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
      */
     protected function _initQuote($storeId)
     {
-        if (is_null($storeId)) {
+        if ($storeId === null) {
             $storeId = Mage::app()->getDefaultStoreView()->getId();
         }
 
@@ -348,7 +355,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
     protected function _createCustomer(array $data, $storeId)
     {
         try {
-            /* @var Profileolabs_Shoppingflux_Model_Manageorders_Convert_Customer $converter */
+            /** @var Profileolabs_Shoppingflux_Model_Manageorders_Convert_Customer $converter */
             $converter = Mage::getModel('profileolabs_shoppingflux/manageorders_convert_customer');
             $this->_customer = $converter->toCustomer(current($data['BillingAddress']), $storeId);
 
@@ -407,6 +414,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
             if (Mage::registry('current_order_sf')) {
                 Mage::unregister('current_order_sf');
             }
+
             if (Mage::registry('current_quote_sf')) {
                 Mage::unregister('current_quote_sf');
             }
@@ -436,7 +444,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
 
                 $this->_importedOrderCount++;
 
-                if (!is_null($order) && $order->getId()) {
+                if (($order !== null) && $order->getId()) {
                     $useMarketplaceDate = $this->getConfig()
                         ->getConfigFlag('shoppingflux_mo/manageorders/use_marketplace_date');
 
@@ -600,11 +608,13 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                         } else {
                             $attributeValue = $product->getData($attributeCode);
                         }
+
                         if (is_string($attributeValue)) {
                             $configurableValues[] = $attributeValue;
                         }
                     }
                 }
+
                 if (!empty($configurableValues)) {
                     $item->setDescription($item->getDescription() . implode(' - ', $configurableValues));
                 }
@@ -699,6 +709,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
             if ($additionalData['other_shoppingflux']) {
                 $additionalData['other_shoppingflux'] .= '<br/>';
             }
+
             $additionalData['other_shoppingflux'] .= 'Relay ID : ' . $sfOrder['ShippingAddress'][0]['RelayID'];
         }
 
@@ -711,7 +722,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
         }
 
         $quote = $this->_getQuote();
-        /* @var $service Mage_Sales_Model_Service_Quote */
+        /** @var Mage_Sales_Model_Service_Quote $service */
         $service = Mage::getModel('sales/service_quote', $this->_getQuote());
         $service->setOrderData($additionalData);
 
@@ -765,6 +776,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                             $orderItem->getData('row_total_incl_tax') - $weeeTaxRowAmount
                         );
                     }
+
                     if ($orderItem->getData('base_row_total_incl_tax')) {
                         $orderItem->setData(
                             'base_row_total_incl_tax',
@@ -813,7 +825,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
 
         $this->_getQuote()->reserveOrderId();
 
-        /* @var Mage_Sales_Model_Convert_Quote $quoteConverter */
+        /** @var Mage_Sales_Model_Convert_Quote $quoteConverter */
         $quoteConverter = Mage::getModel('sales/convert_quote');
         $order = $quoteConverter->addressToOrder($shippingAddress);
         $order->addData($additionalData);
@@ -920,6 +932,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
                 return true;
             }
         }
+
         return false;
     }
 
@@ -935,14 +948,16 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Order extends Varien_Object
         $savedQtys = array();
         $itemsToInvoice = 0;
 
-        /* @var Mage_Sales_Model_Order_Item $orderItem */
+        /** @var Mage_Sales_Model_Order_Item $orderItem */
         foreach ($order->getAllItems() as $orderItem) {
             if (!$orderItem->isDummy() && !$orderItem->getQtyToInvoice() && $orderItem->getLockedDoInvoice()) {
                 continue;
             }
+
             if ($order->getForcedDoShipmentWithInvoice() && $orderItem->getLockedDoShip()) {
                 continue;
             }
+
             if ($orderItem->isDummy() && !empty($savedQtys) && !$this->_needToAddDummy($orderItem, $savedQtys)) {
                 continue;
             }

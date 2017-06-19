@@ -63,9 +63,10 @@ class Profileolabs_Shoppingflux_Block_Adminhtml_System_Config_Form_Fieldset_Abst
      */
     protected function _getFieldRenderer()
     {
-        if (is_null($this->_fieldRenderer)) {
+        if ($this->_fieldRenderer === null) {
             $this->_fieldRenderer = Mage::getBlockSingleton('adminhtml/system_config_form_field');
         }
+
         return $this->_fieldRenderer;
     }
 
@@ -74,7 +75,7 @@ class Profileolabs_Shoppingflux_Block_Adminhtml_System_Config_Form_Fieldset_Abst
      */
     protected function _getDummyElement()
     {
-        if (is_null($this->_dummyElement)) {
+        if ($this->_dummyElement === null) {
             $this->_dummyElement = new Varien_Object(
                 array(
                     'show_in_default' => 0,
@@ -83,6 +84,7 @@ class Profileolabs_Shoppingflux_Block_Adminhtml_System_Config_Form_Fieldset_Abst
                 )
             );
         }
+
         return $this->_dummyElement;
     }
 }

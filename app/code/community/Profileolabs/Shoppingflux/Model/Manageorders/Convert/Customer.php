@@ -53,11 +53,11 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Convert_Customer extends Vari
     public function addresstoCustomer(array $data, $storeId, $customer = null, $type = 'billing')
     {
         if (!$customer instanceof Mage_Customer_Model_Customer) {
-            /* @var Mage_Customer_Model_Customer $customer */
+            /** @var Mage_Customer_Model_Customer $customer */
             $customer = $this->toCustomer($data, $storeId);
         }
 
-        /* @var Mage_Customer_Model_Address $address */
+        /** @var Mage_Customer_Model_Address $address */
         $address = Mage::getModel('customer/address');
         $address->setId(null);
         $address->setIsDefaultBilling(true);
@@ -80,9 +80,11 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Convert_Customer extends Vari
         if (trim($address->getFirstname()) === '') {
             $address->setFirstname(' __ ');
         }
+
         if (strpos(strtolower($address->getCountryId()), 'france') !== false) {
             $address->setCountryId('FR');
         }
+
         if ((trim($address->getTelephone()) === '') && $data['PhoneMobile']) {
             $address->setTelephone($data['PhoneMobile']);
         }
@@ -106,7 +108,14 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Convert_Customer extends Vari
         $regionCollection = Mage::getResourceModel('directory/region_collection');
         $regionCollection->addRegionCodeFilter($regionCode);
         $regionCollection->addCountryFilter($address->getCountry());
-        $regionId = $regionCollection->getFirstItem()->getId();
+
+        if ($regionCollection->getSize() > 0) {
+            $regionCollection->setCurPage(1);
+            $regionCollection->setPageSize(1);
+            $regionId = $regionCollection->getFirstItem()->getId();
+        } else {
+            $regionId = false;
+        }
 
         if ($regionId) {
             $address->setRegionId($regionId);

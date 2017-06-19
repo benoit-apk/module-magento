@@ -2,7 +2,7 @@
     <table cellspacing="0">
         <tr>
             <td style="width:50%;">
-                <h3 class="icon-head head-products"><?php echo $this->__('Select product to export to ShoppingFlux') ?></h3>
+                <h3 class="icon-head head-products"><?php echo $this->htmlEscape($this->__('Select product to export to ShoppingFlux')) ?></h3>
             </td>
             <td class="a-right">
                 <?php echo $this->getButtonsHtml() ?>
@@ -10,7 +10,7 @@
         </tr>
     </table>
 </div>
-<?php if( !$this->isSingleStoreMode() ): ?>
+<?php if (!$this->isSingleStoreMode()): ?>
     <?php echo $this->getChildHtml('store_switcher');?>
 <?php endif;?>
 <div>

@@ -69,19 +69,20 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         $collection->addFieldToFilter('sku', $productSku);
         $collection->addFieldToFilter('store_id', $storeId);
 
-        if ($collection->count() > 0) {
+        if ($collection->getSize() > 0) {
+            $collection->setCurPage(1);
+            $collection->setPageSize(1);
             return $collection->getFirstItem();
         }
 
         /** @var Mage_Catalog_Model_Product $product */
         $product = Mage::getModel('catalog/product');
-        $product = $product->getIdBySku($productSku);
 
         /** @var Profileolabs_Shoppingflux_Model_Export_Flux $entryModel */
         $entryModel = Mage::getModel('profileolabs_shoppingflux/export_flux');
         $entryModel->setStoreId($storeId);
         $entryModel->setSku($productSku);
-        $entryModel->setProductId($product->getId());
+        $entryModel->setProductId($product->getIdBySku($productSku));
         $entryModel->setUpdateNeeded(0);
 
         return $entryModel;
@@ -203,6 +204,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             if (!$this->getConfig()->isExportEnabled($storeId)) {
                 continue;
             }
+
             if (!$inStoreId || ($storeId == $inStoreId)) {
                 /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
                 $productCollection = Mage::getResourceModel('catalog/product_collection');
@@ -261,8 +263,8 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                     if ($shouldExportOnly) {
                         $collection->addFieldToFilter('should_export', 1);
                     }
-                    foreach ($collection as $item) {
 
+                    foreach ($collection as $item) {
                         $this->updateProductInFlux($item->getSku(), $storeId);
                     }
 
@@ -303,6 +305,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                 $this->_excludedNotSalableProductsIds[$storeId] = array();
             }
         }
+
         return $this->_excludedNotSalableProductsIds[$storeId];
     }
 
@@ -396,6 +399,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                 $collection->addIdFilter($parentIds);
                 $parentIds = $collection->getAllIds();
             }
+
             if (!empty($parentIds)) {
                 return false;
             }
@@ -426,6 +430,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                 $this->_attributes[$attributeCode]->setStoreId($storeId);
             }
         }
+
         return $this->_attributes[$attributeCode];
     }
 
@@ -449,11 +454,13 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             if ($attribute->getFrontendInput() === 'date') {
                 return $data;
             }
+
             if ($attribute->usesSource()) {
                 if (is_array($data = $attribute->getSource()->getOptionText($data))) {
                     $data = implode(', ', $data);
                 }
             }
+
             if ($attribute->getFrontendInput() === 'weee') {
                 /** @var Mage_Weee_Model_Tax $weeeTaxModel */
                 $weeeTaxModel = Mage::getSingleton('weee/tax');
@@ -483,6 +490,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         } elseif ($dataKey === 'quantity') {
             $data = round($data);
         }
+
         if (is_array($data)) {
             $data = implode(',', $data);
         }
@@ -495,13 +503,13 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         $request = Mage::app()->getRequest();
 
         if (($request->getControllerName() === 'export_flux') && ($request->getActionName() === 'index')) {
-            if (is_null($this->_memoryLimit)) {
+            if ($this->_memoryLimit === null) {
                 $memoryLimit = ini_get('memory_limit');
 
                 if (preg_match('%M$%', $memoryLimit)) {
-                    $this->_memoryLimit = intval($memoryLimit) * 1024 * 1024;
+                    $this->_memoryLimit = (int) $memoryLimit * 1024 * 1024;
                 } else if (preg_match('%G$%', $memoryLimit)) {
-                    $this->_memoryLimit = intval($memoryLimit) * 1024 * 1024 * 1024;
+                    $this->_memoryLimit = (int) $memoryLimit * 1024 * 1024 * 1024;
                 } else {
                     $this->_memoryLimit = false;
                 }
@@ -535,6 +543,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                             . ' - Max execution time : '
                             . $this->_maxExecutionTime;
                     }
+
                     if ($this->_memoryLimit - 10 * 1024 * 1024 <= $currentMemoryUsage) {
                         $reasons[] = 'Memory limit : Used ' . $currentMemoryUsage . ' of ' . $this->_memoryLimit;
                     }
@@ -582,8 +591,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
     public function updateProductInFlux($productSku, $storeId)
     {
         $product = $this->_getProductBySku($productSku, $storeId);
-        /** @var Mage_CatalogInventory_Model_Stock_Item $stockItem */
-        $stockItem = $product->getStockItem();
+
         /** @var Mage_Core_Model_Date $dateModel */
         $dateModel = Mage::getSingleton('core/date');
 
@@ -595,6 +603,9 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             $fluxEntry->save();
             return;
         }
+
+        /** @var Mage_CatalogInventory_Model_Stock_Item $stockItem */
+        $stockItem = $product->getStockItem();
 
         if (!$this->_shouldUpdate($product, $storeId)) {
             $fluxEntry = $this->getEntry($product->getSku(), $storeId);
@@ -629,7 +640,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             'mage-sku' => $product->getSku(),
             'product-url' => $this->cleanUrl($product->getProductUrl(false)),
             'is-in-stock' => $manageStock ? $product->getStockItem()->getIsInStock() : 1,
-            'salable' => intval($product->isSalable()),
+            'salable' => (int) $product->isSalable(),
             'qty' => $product->isSalable() ? ($manageStock ? round($stockItem->getQty()) : 100) : 0,
             'qty-increments' => $transformQtyIncrements ? 1 : $configQtyIncrements,
             'tax-rate' => $product->getTaxPercent(),
@@ -701,8 +712,8 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                 'stock_value' => $stockItem->getQty(),
                 'price_value' => $product->getFinalPrice(),
                 'is_in_stock' => $data['is-in-stock'],
-                'salable' => intval($product->isSalable()),
-                'is_in_flux' => intval($product->getData('shoppingflux_product')),
+                'salable' => (int) $product->isSalable(),
+                'is_in_flux' => (int) $product->getData('shoppingflux_product'),
                 'type' => $product->getTypeId(),
                 'visibility' => $product->getVisibility(),
                 'should_export' => 1,
@@ -788,6 +799,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         if ($discountFromDate) {
             $data['start-date-discount'] = $discountFromDate;
         }
+
         if ($discountToDate) {
             $data['end-date-discount'] = $discountToDate;
         }
@@ -1001,6 +1013,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                 if ($mediaUrl . $baseImage == $mediaConfig->getMediaUrl($image['file'])) {
                     continue;
                 }
+
                 if ($image['disabled']) {
                     continue;
                 }
@@ -1045,6 +1058,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
         if ($price == '0') {
             $price = round($product->getMinimalPrice(), 2);
         }
+
         if ($price == '0') {
             return 0;
         }
@@ -1082,6 +1096,7 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
             $countryCode = $this->getConfig()->getConfigData('shoppingflux_export/general/shipping_price_based_on');
             $shippingPrice = $this->getHelper()->getShippingPrice($product, $carrier, $countryCode);
         }
+
         if (!$shippingPrice) {
             $shippingPrice = $this->getConfig()->getConfigData('shoppingflux_export/general/default_shipping_price');
         }
@@ -1271,9 +1286,11 @@ class Profileolabs_Shoppingflux_Model_Export_Flux extends Mage_Core_Model_Abstra
                     $eanValue = $usedProduct->getData($attributesFromConfig['ean']);
                     $usedProductsArray[$usedProductId]['child']['ean'] = $eanValue;
                 }
+
                 if (!$data['tax-rate'] && $usedProductsArray[$usedProductId]['child']['tax-rate']) {
                     $data['tax-rate'] = $usedProductsArray[$usedProductId]['child']['tax-rate'];
                 }
+
                 if (($qty > 0) && ($qty > $data['qty'])) {
                     $data['qty'] = round($qty);
                 }

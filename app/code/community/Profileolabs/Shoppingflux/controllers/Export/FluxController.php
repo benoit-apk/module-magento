@@ -114,9 +114,11 @@ class Profileolabs_Shoppingflux_Export_FluxController extends Mage_Core_Controll
         if ($limit) {
             $block->setLimit($limit);
         }
+
         if ($productSku) {
             $block->setProductSku($productSku);
         }
+
         if ($forceMultiStore) {
             $block->setForceMultiStores(true);
         }

@@ -2,7 +2,7 @@
 <div class="content-header">
     <table cellspacing="0">
         <tr>
-            <td><h3><?php echo $this->__('ShoppingFlux order import') ?></h3></td>
+            <td><h3><?php echo $this->htmlEscape($this->__('ShoppingFlux order import')) ?></h3></td>
             <td class="form-buttons"></td>
          </tr>
     </table>
@@ -10,9 +10,9 @@
 <table class="form-list">
     <tr>
         <td class="scope-label">
-            <button onclick="setLocation('<?php echo $this->getImportOrdersUrl()?>')" type="button" class="scalable"><span><?php echo $this->__('Import new ShoppingFlux orders') ?></span></button>
+            <button onclick="setLocation('<?php echo $this->jsQuoteEscape($this->getImportOrdersUrl()) ?>')" type="button" class="scalable"><span><?php echo $this->htmlEscape($this->__('Import new ShoppingFlux orders')) ?></span></button>
         </td>
         <td class="scope-label">
-            <?php echo $this->__('Will import pending ShoppingFlux orders')?>
+            <?php echo $this->htmlEscape($this->__('Will import pending ShoppingFlux orders')) ?>
         </td>
 </table>

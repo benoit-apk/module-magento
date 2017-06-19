@@ -14,11 +14,11 @@ if($_storeCode):
 
 <div class="shoppingflux-register entry-edit">
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Shopping Flux') ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->htmlEscape($this->__('Shopping Flux')) ?></h4>
     </div>
     <div class="fieldset fieldset-wide">
         <div style="text-align:center;">
-            <button class="scalable add"  onclick="window.location='https://register.shopping-feed.com/sign/magento?email=<?php echo $_email ?>&feed=<?php echo $_feed ?>&lang=<?php echo $_lang ?>&token=<?php echo $_token ?>'; return false;"><span><?php echo $this->__('Register Now') ?></span></button>
+            <button class="scalable add"  onclick="window.location='https://register.shopping-feed.com/sign/magento?email=<?php echo $this->htmlEscape($_email) ?>&feed=<?php echo $this->htmlEscape($_feed) ?>&lang=<?php echo $this->htmlEscape($_lang) ?>&token=<?php echo $this->htmlEscape($_token) ?>'; return false;"><span><?php echo $this->htmlEscape($this->__('Register Now')) ?></span></button>
             <br/>
         </div>
         
@@ -42,7 +42,7 @@ if($_storeCode):
         <br/><br/>
         <p><strong style="font-size:1.5em;">With over 1400 Members worldwide, helping them achieve over $13 Million in monthly revenue, Lets us help you put your feeds to work.</strong></p>
         <div style="text-align:center;clear:both;">
-            <button class="scalable add"  onclick="window.location='https://register.shopping-feed.com/sign/magento?email=<?php echo $_email ?>&feed=<?php echo $_feed ?>&lang=<?php echo $_lang ?>&token=<?php echo $_token ?>'; return false;"><span><?php echo $this->__('Register Now') ?></span></button>
+            <button class="scalable add"  onclick="window.location='https://register.shopping-feed.com/sign/magento?email=<?php echo $this->htmlEscape($_email) ?>&feed=<?php echo $this->htmlEscape($_feed) ?>&lang=<?php echo $this->htmlEscape($_lang) ?>&token=<?php echo $this->htmlEscape($_token) ?>'; return false;"><span><?php echo $this->htmlEscape($this->__('Register Now')) ?></span></button>
             <br/>
         </div>
     </div>

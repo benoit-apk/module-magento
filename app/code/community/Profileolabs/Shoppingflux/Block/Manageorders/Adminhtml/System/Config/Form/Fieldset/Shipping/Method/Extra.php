@@ -17,9 +17,11 @@ class Profileolabs_Shoppingflux_Block_Manageorders_Adminhtml_System_Config_Form_
         foreach ($collection as $shippingMethod) {
             $this->_addShippingMethodField($element, $shippingMethod->getFullShippingMethodCode(), 10 * $i++);
         }
+
         if ($i === 1) {
             $this->_addEmptyField($element);
         }
+
         foreach ($element->getSortedElements() as $field) {
             $html .= $field->toHtml();
         }

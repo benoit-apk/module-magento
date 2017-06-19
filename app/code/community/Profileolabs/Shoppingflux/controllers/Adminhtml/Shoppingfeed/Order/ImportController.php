@@ -31,7 +31,7 @@ class Profileolabs_Shoppingflux_Adminhtml_Shoppingfeed_Order_ImportController ex
             /** @var Profileolabs_Shoppingflux_Helper_Data $helper */
             $helper = Mage::helper('profileolabs_shoppingflux');
 
-            /* @var Profileolabs_Shoppingflux_Model_ManageOrders_Order $importer */
+            /** @var Profileolabs_Shoppingflux_Model_ManageOrders_Order $importer */
             $importer = Mage::getModel('profileolabs_shoppingflux/manageorders_order');
             $importer->manageOrders();
 

@@ -115,14 +115,14 @@ $installer = $this;
 $installer->startSetup();
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_log')}` (
-`id` int(11) NOT NULL auto_increment,
-`date` timestamp NOT NULL default CURRENT_TIMESTAMP,
-`message` text NOT NULL,
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_log')}` (
+    `id` int(11) NOT NULL auto_increment,
+    `date` timestamp NOT NULL default CURRENT_TIMESTAMP,
+    `message` text NOT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->endSetup();

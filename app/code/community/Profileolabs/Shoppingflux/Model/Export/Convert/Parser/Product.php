@@ -31,6 +31,7 @@ class Profileolabs_Shoppingflux_Model_Export_Convert_Parser_Product extends Mage
 
             $attributes[$code] = $code;
         }
+
         foreach ($this->_inventoryFields as $field) {
             $attributes[$field] = $field;
         }

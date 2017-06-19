@@ -12,7 +12,7 @@ class Profileolabs_Shoppingflux_Model_Export_Source_Attributesprice
      */
     public function toOptionArray()
     {
-        if (is_null($this->_attributes)) {
+        if ($this->_attributes === null) {
             $this->_attributes = array(array('value' => '', 'label' => ''));
 
             /** @var Mage_Catalog_Model_Resource_Product $productResource */
@@ -30,6 +30,7 @@ class Profileolabs_Shoppingflux_Model_Export_Source_Attributesprice
                 }
             }
         }
+
         return $this->_attributes;
     }
 }

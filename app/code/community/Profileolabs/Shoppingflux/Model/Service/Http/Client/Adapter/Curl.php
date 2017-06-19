@@ -105,6 +105,7 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
                 'cURL extension has to be loaded to use this Zend_Http_Client adapter.'
             );
         }
+
         $this->_invalidOverwritableCurlOptions = array(
             CURLOPT_HTTPGET,
             CURLOPT_POST,
@@ -135,7 +136,6 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
     {
         if ($config instanceof Zend_Config) {
             $config = $config->toArray();
-
         } elseif (!is_array($config)) {
             #require_once 'Zend/Http/Client/Adapter/Exception.php';
             throw new Zend_Http_Client_Adapter_Exception(
@@ -188,6 +188,7 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
         if (!isset($this->_config['curloptions'])) {
             $this->_config['curloptions'] = array();
         }
+
         $this->_config['curloptions'][$option] = $value;
         return $this;
     }
@@ -219,8 +220,9 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
 
         // Do the actual connection
         $this->_curl = curl_init();
+
         if ($port != 80) {
-            curl_setopt($this->_curl, CURLOPT_PORT, intval($port));
+            curl_setopt($this->_curl, CURLOPT_PORT, (int) $port);
         }
 
         // Set timeout
@@ -241,6 +243,7 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
             if (isset($this->_config['sslcert'])) {
                 curl_setopt($this->_curl, CURLOPT_SSLCERT, $this->_config['sslcert']);
             }
+
             if (isset($this->_config['sslpassphrase'])) {
                 curl_setopt($this->_curl, CURLOPT_SSLCERTPASSWD, $this->_config['sslpassphrase']);
             }
@@ -295,6 +298,7 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
                 if (is_resource($body)) {
                     $this->_config['curloptions'][CURLOPT_INFILE] = $body;
                 }
+
                 if (isset($this->_config['curloptions'][CURLOPT_INFILE])) {
                     // Now we will probably already have Content-Length set, so that we have to delete it
                     // from $headers at this point:
@@ -472,6 +476,7 @@ class Profileolabs_Shoppingflux_Model_Service_Http_Client_Adapter_Curl implement
         if (is_resource($this->_curl)) {
             curl_close($this->_curl);
         }
+
         $this->_curl = null;
         $this->_connected_to = array(null, null);
     }

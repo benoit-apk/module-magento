@@ -4,7 +4,7 @@ class Profileolabs_Shoppingflux_Model_Catalog_Product_Collection extends Mage_Ca
 {
     public function getSize()
     {
-        if (is_null($this->_totalRecords)) {
+        if ($this->_totalRecords === null) {
             $sql = $this->getSelectCountSql();
             $result = $this->getConnection()->fetchAll($sql, $this->_bindParams);
 
@@ -12,6 +12,7 @@ class Profileolabs_Shoppingflux_Model_Catalog_Product_Collection extends Mage_Ca
                 $this->_totalRecords += reset($row);
             }
         }
-        return intval($this->_totalRecords);
+
+        return (int) $this->_totalRecords;
     }
 }
