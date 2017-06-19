@@ -16,7 +16,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Log extends Mage_Core_Model_A
     {
         $orderMessage = '';
 
-        if (!is_null($orderId)) {
+        if ($orderId !== null) {
             /** @var Profileolabs_Shoppingflux_Helper_Data $helper */
             $helper = Mage::helper('profileolabs_shoppingflux');
 

@@ -5,11 +5,11 @@ $installer = Mage::getResourceModel('catalog/setup', 'profileolabs_shoppingflux_
 $installer->startSetup();
 
 $installer->run(
-"
-UPDATE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` SET update_needed = 1, should_export = 1;
-ALTER TABLE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` ADD `price_value` DECIMAL(12, 4) NOT NULL AFTER `stock_value`;
-ALTER TABLE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` ADD `salable` TINYINT(1) NOT NULL AFTER `is_in_stock`;
-"
+    "
+    UPDATE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` SET update_needed = 1, should_export = 1;
+    ALTER TABLE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` ADD `price_value` DECIMAL(12, 4) NOT NULL AFTER `stock_value`;
+    ALTER TABLE `{$this->getTable('profileolabs_shoppingflux/export_flux')}` ADD `salable` TINYINT(1) NOT NULL AFTER `is_in_stock`;
+    "
 );
 
 $attributeMapping = array(

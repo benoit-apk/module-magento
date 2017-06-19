@@ -43,7 +43,7 @@ class Profileolabs_Shoppingflux_Model_Export_Source_Attributes
      */
     public function toOptionArray()
     {
-        if (is_null($this->_attributes)) {
+        if ($this->_attributes === null) {
             $this->_attributes = array(array('value' => '', 'label' => ''));
 
             /** @var Profileolabs_Shoppingflux_Model_Export_Convert_Parser_Product $productParser */
@@ -55,6 +55,7 @@ class Profileolabs_Shoppingflux_Model_Export_Source_Attributes
                 }
             }
         }
+
         return $this->_attributes;
     }
 }

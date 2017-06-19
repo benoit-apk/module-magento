@@ -9,7 +9,7 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
 
     protected function _saveCache($data)
     {
-        return;
+        return $this;
     }
 
     /**
@@ -22,7 +22,6 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
 
     protected function _toHtml()
     {
-        // @todo ??!!?!
         Profileolabs_Shoppingflux_Model_Export_Observer::checkStock();
         $useAllStores = $this->getForceMultiStores() || $this->getConfig()->getUseAllStoreProducts();
 
@@ -30,7 +29,6 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
         $fluxModel = Mage::getModel('profileolabs_shoppingflux/export_flux');
 
         if ($this->getProductSku() && ($this->getRequest()->getParam('update') == 1)) {
-
             if (!$this->getConfig()->getUseAllStoreProducts()) {
                 $fluxModel->updateProductInFlux(
                     $this->getProductSku(),
@@ -45,12 +43,13 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
         $memoryLimit = ini_get('memory_limit');
 
         if (preg_match('%M$%', $memoryLimit)) {
-            $memoryLimit = intval($memoryLimit) * 1024 * 1024;
+            $memoryLimit = (int) $memoryLimit * 1024 * 1024;
         } else if (preg_match('%G$%', $memoryLimit)) {
-            $memoryLimit = intval($memoryLimit) * 1024 * 1024 * 1024;
+            $memoryLimit = (int) $memoryLimit * 1024 * 1024 * 1024;
         } else {
             $memoryLimit = false;
         }
+
         if ($memoryLimit > 0) {
             if ($memoryLimit <= 128 * 1024 * 1024) {
                 $maxImportLimit = 100;
@@ -79,15 +78,17 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
             $collection->addFieldToFilter('store_id', Mage::app()->getStore()->getId());
         }
 
-        $totalSize = $collection->count();
+        $totalSize = $collection->getSize();
         $collection->clear();
 
         if (!$this->getConfig()->isExportNotSalable() && !$withNotSalableRetention) {
             $collection->addFieldToFilter('salable', 1);
         }
+
         if (!$this->getConfig()->isExportSoldout() && !$withNotSalableRetention) {
             $collection->addFieldToFilter('is_in_stock', 1);
         }
+
         if ($this->getConfig()->isExportFilteredByAttribute()) {
             $collection->addFieldToFilter('is_in_flux', 1);
         }
@@ -109,9 +110,9 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
                 'generated-at' => date('d/m/Y H:i:s', $dateModel->timestamp(time())),
                 'size-exportable' => $totalSize,
                 'size-xml' => $collection->count(),
-                'with-out-of-stock' => intval($this->getConfig()->isExportSoldout()),
-                'with-not-salable' => intval($this->getConfig()->isExportNotSalable()),
-                'selected-only' => intval($this->getConfig()->isExportFilteredByAttribute()),
+                'with-out-of-stock' => (int) $this->getConfig()->isExportSoldout(),
+                'with-not-salable' => (int) $this->getConfig()->isExportNotSalable(),
+                'selected-only' => (int) $this->getConfig()->isExportFilteredByAttribute(),
                 'visibilities' => implode(',', $visibilities)
             )
         );
@@ -121,6 +122,7 @@ class Profileolabs_Shoppingflux_Block_Export_Flux extends Mage_Core_Block_Abstra
         if ($this->getProductSku()) {
             $collection->addFieldToFilter('sku', $this->getProductSku());
         }
+
         if ($this->getLimit()) {
             $collection->getSelect()->limit($this->getLimit());
         }

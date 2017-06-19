@@ -15,7 +15,7 @@ class Profileolabs_Shoppingflux_Model_Mysql4_Export_Flux extends Mage_Core_Model
         $adapter = $this->_getWriteAdapter();
         $conditions = array($adapter->quoteInto('should_export = ?', 1));
 
-        if (!is_null($storeId)) {
+        if ($storeId !== null) {
             $conditions[] = $adapter->quoteInto('store_id = ?', $storeId);
         }
 

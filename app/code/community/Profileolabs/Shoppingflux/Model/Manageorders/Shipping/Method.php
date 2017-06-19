@@ -39,13 +39,15 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Shipping_Method extends Mage_
         $collection->addFieldToFilter('marketplace', $marketplace);
         $collection->addFieldToFilter('shipping_method', $shippingMethod);
 
-        if ($collection->count() <= 0) {
+        if ($collection->getSize === 0) {
             $this->setId(null);
             $this->setMarketplace($marketplace);
             $this->setShippingMethod($shippingMethod);
             return $this;
         }
 
+        $collection->setCurPage(1);
+        $collection->setPageSize(1);
         return $collection->getFirstItem();
     }
 

@@ -6,7 +6,7 @@ class Profileolabs_Shoppingflux_Model_System_Config_Source_Categories
 
     public function toOptionArray()
     {
-        if (is_null(self::$_optionArray)) {
+        if (self::$_optionArray === null) {
             self::$_optionArray = array();
             $categories = Mage::helper('profileolabs_shoppingflux')
                 ->getCategoriesWithParents('name', Mage_Core_Model_App::ADMIN_STORE_ID);

@@ -66,6 +66,7 @@ class Profileolabs_Shoppingflux_Helper_String extends Mage_Core_Helper_String
         if (!$str || (strpos($str, '=') === false)) {
             return false;
         }
+
         return true;
     }
 
@@ -110,6 +111,7 @@ class Profileolabs_Shoppingflux_Helper_String extends Mage_Core_Helper_String
                 }
             }
         }
+
         return $baseArray;
     }
 

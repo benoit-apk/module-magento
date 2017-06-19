@@ -17,9 +17,10 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getConfig()
     {
-        if (is_null($this->_config)) {
+        if ($this->_config === null) {
             $this->_config = Mage::getSingleton('profileolabs_shoppingflux/config');
         }
+
         return $this->_config;
     }
 
@@ -78,7 +79,7 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
                 $apiKey = Mage::getStoreConfig('shoppingflux/configuration/api_key', 0);
 
                 if (!$apiKey) {
-                    $apiKey = $this->generateToken(strval($store->getId()));
+                    $apiKey = $this->generateToken((string) $store->getId());
                 }
 
                 Mage::getConfig()->saveConfig(
@@ -224,13 +225,12 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _getShippingRequest($product, $countryCode = 'FR')
     {
-        /** @var $request Mage_Shipping_Model_Rate_Request */
+        /** @var Mage_Shipping_Model_Rate_Request $request */
         $request = Mage::getModel('shipping/rate_request');
         $storeId = $request->getStoreId();
 
         if (!$request->getOrig()) {
-            $request
-                ->setCountryId($countryCode)
+            $request->setCountryId($countryCode)
                 ->setRegionId('')
                 ->setCity('')
                 ->setPostcode('');
@@ -334,7 +334,7 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
         $withInactive = false,
         $withNotInMenu = true
     ) {
-        if (is_null($this->_categoriesWithParents)) {
+        if ($this->_categoriesWithParents === null) {
             $mageCacheKey = 'shoppingflux_category_list'
                 . (Mage::app()->getStore()->isAdmin() ? '_admin' : '')
                 . '_' . (int) $storeId
@@ -376,6 +376,7 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
                 if (!$withInactive) {
                     $categories->addFieldToFilter('is_active', array('eq' => '1'));
                 }
+
                 if (!$withNotInMenu) {
                     if (version_compare(Mage::getVersion(), '1.4.0') > 0) {
                         $categories->addFieldToFilter('include_in_menu', array('eq' => '1'));
@@ -502,7 +503,7 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
         if (Mage::getStoreConfigFlag('shoppingflux/configuration/has_registered')) {
             return true;
         } else {
-            $lastDelay = time() - intval(Mage::getStoreConfig('shoppingflux/configuration/registration_last_check'));
+            $lastDelay = time() - (int) Mage::getStoreConfig('shoppingflux/configuration/registration_last_check');
 
             if ($lastDelay > 24 * 60 * 60) {
                 foreach (Mage::app()->getStores() as $store) {
@@ -520,6 +521,7 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
                 $config->saveConfig('shoppingflux/configuration/registration_last_check', time());
             }
         }
+
         return false;
     }
 
@@ -536,10 +538,12 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
             if (!preg_match('%http%i', $mailContent['Magento URL'])) {
                 $mailContent['Magento URL'] = implode(
                     '/',
-                    array(
-                        @$_SERVER['HTTP_HOST'],
-                        @$_SERVER['HTTP_REFERER'],
-                        @$_SERVER['SERVER_NAME'],
+                    array_filter(
+                        array(
+                            isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '',
+                            isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
+                            isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '',
+                        )
                     )
                 );
             }
@@ -578,14 +582,14 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
                         $store->getName(),
                     )
                 );
-                
+
                 $mailContent['Store #' . $storeId . ' Url '] = $store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
                 $mailContent['Store #' . $storeId . ' Feed '] = $this->getFeedUrl($store);
                 $mailContent['Store #' . $storeId . ' Refresh Url '] = $this->getFeedUrl($store, 'refreshEverything');
                 $mailContent['Store #' . $storeId . ' Status Url '] = $this->getFeedUrl($store, 'status');
                 $mailContent['Store #' . $storeId . ' is default ?'] = ($defaultStoreId == $storeId ? 'Yes' : 'No');
             }
-            
+
             /** @var Mage_Catalog_Model_Resource_Product_Collection $productCollection */
             $productCollection = Mage::getResourceModel('catalog/product_collection');
             $mailContent['Products count'] = $productCollection->getSize();
@@ -626,21 +630,21 @@ class Profileolabs_Shoppingflux_Helper_Data extends Mage_Core_Helper_Abstract
             $mailContent['Bundle products count'] = $productCollection->getSize();
 
             $mailLines = array();
-            
+
             foreach ($mailContent as $key => $value) {
                 $mailLines[] = '<strong>' . $key . ' : </strong>' . $value;
             }
-            
+
             $mailContent = implode('<br>', $mailLines);
 
             $mail = new Zend_Mail();
             $mail->setBodyHtml($mailContent);
             $mail->setFrom('no-reply@shopping-feed.com', 'Shopping Feed Magento Extension');
-            
+
             foreach ($sendTo as $email) {
                 $mail->addTo($email, $email);
             }
-            
+
             $mail->setSubject('ShoppingFeed installation on Magento');
             $mail->send();
         } catch (Exception $e) {

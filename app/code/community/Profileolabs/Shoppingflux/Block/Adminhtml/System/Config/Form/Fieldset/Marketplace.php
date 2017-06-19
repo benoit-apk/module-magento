@@ -22,6 +22,7 @@ abstract class Profileolabs_Shoppingflux_Block_Adminhtml_System_Config_Form_Fiel
         foreach ($marketplaces as $marketplace) {
             $this->_addMarketplaceField($element, $marketplace, 10 * $i++);
         }
+
         foreach ($element->getSortedElements() as $field) {
             $html .= $field->toHtml();
         }
@@ -84,7 +85,6 @@ abstract class Profileolabs_Shoppingflux_Block_Adminhtml_System_Config_Form_Fiel
         } elseif ($this->getForm()->getConfigRoot()) {
             $fieldValue = (string) $this->getForm()->getConfigRoot()->descend($configPath);
             $isInheriting = true;
-
         }
 
         /** @var Mage_Adminhtml_Block_System_Config_Form $form */

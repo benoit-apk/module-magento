@@ -9,7 +9,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
      */
     public function getConfigData($key, $storeId = null)
     {
-        $dataKey = str_replace('/', '_', 'conf/' . $key . '/' . (is_null($storeId) ? '0' : $storeId));
+        $dataKey = str_replace('/', '_', 'conf/' . $key . '/' . (($storeId === null) ? '0' : $storeId));
 
         if (!$this->hasData($dataKey)) {
             $value = Mage::getStoreConfig($key, $storeId);
@@ -26,7 +26,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
      */
     public function getConfigFlag($key, $storeId = null)
     {
-        $dataKey = str_replace('/', '_', 'flag/' . $key . '/' . (is_null($storeId) ? '0' : $storeId));
+        $dataKey = str_replace('/', '_', 'flag/' . $key . '/' . (($storeId === null) ? '0' : $storeId));
 
         if (!$this->hasData($dataKey)) {
             $value = Mage::getStoreConfigFlag($key, $storeId);
@@ -247,7 +247,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
     {
         /** @var Mage_CatalogInventory_Model_Stock_Item $stockItem */
         $stockItem = $product->getStockItem();
-        return $stockItem->getData('enable_qty_increments') ? max(1, intval($stockItem->getData('qty_increments'))) : 1;
+        return $stockItem->getData('enable_qty_increments') ? max(1, (int) $stockItem->getData('qty_increments')) : 1;
     }
 
     /**
@@ -273,6 +273,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
         if (isset($data['additional'])) {
             unset($data['additional']);
         }
+
         if (isset($data['additional,'])) {
             unset($data['additional,']);
         }
@@ -297,7 +298,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
      */
     public function getMemoryLimit()
     {
-        $memoryLimit = intval($this->getConfigData('shoppingflux_export/general/memory_limit'));
+        $memoryLimit = (int) $this->getConfigData('shoppingflux_export/general/memory_limit');
         return ($memoryLimit > 10 ? $memoryLimit : 2048);
     }
 
@@ -312,6 +313,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
                 return true;
             }
         }
+
         return false;
     }
 
@@ -449,7 +451,7 @@ class Profileolabs_Shoppingflux_Model_Config extends Varien_Object
      */
     public function getShipmentUpdateLimit($storeId = null)
     {
-        $hoursLimit = intval(Mage::getStoreConfig('shoppingflux_mo/shipment_update/limit_hours', $storeId));
+        $hoursLimit = (int) Mage::getStoreConfig('shoppingflux_mo/shipment_update/limit_hours', $storeId);
         return $hoursLimit
             ? date('Y-m-d H:i:s', strtotime('-' . $hoursLimit . ' hours'))
             : date('Y-m-d H:i:s', strtotime('-20 minutes'));

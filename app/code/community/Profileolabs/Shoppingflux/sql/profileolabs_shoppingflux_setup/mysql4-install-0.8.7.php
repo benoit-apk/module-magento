@@ -268,89 +268,90 @@ $installer = $this;
 $installer->startSetup();
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_log')}` (
-`id` int(11) NOT NULL auto_increment,
-`date` timestamp NOT NULL default CURRENT_TIMESTAMP,
-`message` text NOT NULL,
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_log')}` (
+    `id` int(11) NOT NULL auto_increment,
+    `date` timestamp NOT NULL default CURRENT_TIMESTAMP,
+    `message` text NOT NULL,
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/export_updates')}` (
-`update_id` int(11) NOT NULL auto_increment,
-`store_id` int(11) NOT NULL,
-`product_sku` varchar(255) NOT NULL,
-`stock_value` int(11) NOT NULL,
-`price_value` decimal(12,4) NOT NULL,
-`old_price_value` decimal(12,4) NOT NULL,
-`updated_at` timestamp NOT NULL default CURRENT_TIMESTAMP,
-PRIMARY KEY (`update_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/export_updates')}` (
+    `update_id` int(11) NOT NULL auto_increment,
+    `store_id` int(11) NOT NULL,
+    `product_sku` varchar(255) NOT NULL,
+    `stock_value` int(11) NOT NULL,
+    `price_value` decimal(12,4) NOT NULL,
+    `old_price_value` decimal(12,4) NOT NULL,
+    `updated_at` timestamp NOT NULL default CURRENT_TIMESTAMP,
+    PRIMARY KEY (`update_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/export_flux')}` (
-`id` int(11) NOT NULL auto_increment,
-`product_id` int(11) NOT NULL default 0,
-`sku` varchar(255) NOT NULL default '',
-`store_id` smallint(5) NOT NULL default 1,
-`xml` MEDIUMTEXT NOT NULL,
-`stock_value` INT( 11 ) NOT NULL,
-`price_value` DECIMAL( 12,4 ) NOT NULL,
-`is_in_stock` tinyint(1) NOT NULL,
-`salable` tinyint(1) NOT NULL,
-`is_in_flux` tinyint(1) NOT NULL,
-`type` varchar(50) NOT NULL,
-`visibility` varchar(50) NOT NULL,
-`update_needed` tinyint(1) NOT NULL,
-`should_export` tinyint(1) NOT NULL,
-`updated_at` datetime NOT NULL,
-PRIMARY KEY (`id`),
-CONSTRAINT SF_E_F_UNIQUE UNIQUE (`sku`, `store_id`),
-INDEX (`update_needed`),
-INDEX (`product_id`),
-INDEX (`is_in_stock`),
-INDEX (`is_in_flux`),
-INDEX (`type`),
-INDEX (`visibility`),
-INDEX (`should_export`),
-INDEX (`type`, `is_in_stock`, `is_in_flux`, `visibility`, `store_id`, `should_export`),
-INDEX (`type`, `is_in_flux`, `visibility`, `store_id`,`should_export`),
-INDEX (`type`, `is_in_stock`, `visibility`, `store_id`, `should_export`),
-INDEX (`type`, `visibility`, `store_id`, `should_export`),
-INDEX (`sku`),
-INDEX (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/export_flux')}` (
+    `id` int(11) NOT NULL auto_increment,
+    `product_id` int(11) NOT NULL default 0,
+    `sku` varchar(255) NOT NULL default '',
+    `store_id` smallint(5) NOT NULL default 1,
+    `xml` MEDIUMTEXT NOT NULL,
+    `stock_value` INT( 11 ) NOT NULL,
+    `price_value` DECIMAL( 12,4 ) NOT NULL,
+    `is_in_stock` tinyint(1) NOT NULL,
+    `salable` tinyint(1) NOT NULL,
+    `is_in_flux` tinyint(1) NOT NULL,
+    `type` varchar(50) NOT NULL,
+    `visibility` varchar(50) NOT NULL,
+    `update_needed` tinyint(1) NOT NULL,
+    `should_export` tinyint(1) NOT NULL,
+    `updated_at` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT SF_E_F_UNIQUE UNIQUE (`sku`, `store_id`),
+    INDEX (`update_needed`),
+    INDEX (`product_id`),
+    INDEX (`is_in_stock`),
+    INDEX (`is_in_flux`),
+    INDEX (`type`),
+    INDEX (`visibility`),
+    INDEX (`should_export`),
+    INDEX (`type`, `is_in_stock`, `is_in_flux`, `visibility`, `store_id`, `should_export`),
+    INDEX (`type`, `is_in_flux`, `visibility`, `store_id`,`should_export`),
+    INDEX (`type`, `is_in_stock`, `visibility`, `store_id`, `should_export`),
+    INDEX (`type`, `visibility`, `store_id`, `should_export`),
+    INDEX (`sku`),
+    INDEX (`store_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_shipping_method')}` (
-`id` int(11) NOT NULL auto_increment,
-`shipping_method` varchar(255) NOT NULL default '',
-`marketplace` varchar(127) NOT NULL default '',
-`last_seen_at` datetime NOT NULL,
-PRIMARY KEY (`id`),
-CONSTRAINT SF_S_M_UNIQUE UNIQUE (`shipping_method`, `marketplace`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_shipping_method')}` (
+    `id` int(11) NOT NULL auto_increment,
+    `shipping_method` varchar(255) NOT NULL default '',
+    `marketplace` varchar(127) NOT NULL default '',
+    `last_seen_at` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT SF_S_M_UNIQUE UNIQUE (`shipping_method`, `marketplace`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->run(
-"
-CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_export_shipments')}` (
-`update_id` int(11) NOT NULL auto_increment,
-`shipment_id` int(11) NOT NULL,
-`updated_at` timestamp NOT NULL default CURRENT_TIMESTAMP,
-PRIMARY KEY (`update_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-"
+    "
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('profileolabs_shoppingflux/manageorders_export_shipments')}` (
+    `update_id` int(11) NOT NULL auto_increment,
+    `shipment_id` int(11) NOT NULL,
+    `updated_at` timestamp NOT NULL default CURRENT_TIMESTAMP,
+    PRIMARY KEY (`update_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    "
 );
 
 $installer->endSetup();

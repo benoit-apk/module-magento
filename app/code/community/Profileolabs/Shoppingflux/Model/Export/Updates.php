@@ -20,12 +20,13 @@ class Profileolabs_Shoppingflux_Model_Export_Updates extends Mage_Core_Model_Abs
         $collection = $this->getCollection();
         $collection->addFieldToFilter('product_sku', $data['product_sku']);
         $collection->addFieldToFilter('store_id', $data['store_id']);
-        $collection->load();
 
-        if ($collection->getSize() <= 0) {
+        if ($collection->getSize() === 0) {
             return $this;
         }
 
+        $collection->setCurPage(1);
+        $collection->setPageSize(1);
         return $this->load($collection->getFirstItem()->getId());
     }
 }

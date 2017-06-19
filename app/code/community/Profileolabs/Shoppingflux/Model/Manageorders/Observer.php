@@ -152,6 +152,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Observer
                 'Order ' . $orderIdShoppingflux . ' has been canceled. Information sent to ShoppingFlux.'
             );
         }
+
         return $this;
     }
 
@@ -216,6 +217,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Observer
                 }
             }
         }
+
         return $this;
     }
 
@@ -367,6 +369,7 @@ class Profileolabs_Shoppingflux_Model_Manageorders_Observer
                 $apiKey = $this->getConfig()->getApiKey($store->getId());
             }
         }
+
         if (!$apiKey) {
             return;
         }

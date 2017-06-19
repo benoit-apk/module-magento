@@ -104,16 +104,18 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
         $collection = Mage::getResourceModel('profileolabs_shoppingflux/export_flux_collection');
         $collection->addFieldToFilter('should_export', 1);
         $collection->addFieldToFilter('store_id', $storeId);
-        $sizeTotal = $collection->count();
+        $sizeTotal = $collection->getSize();
         $collection->clear();
         $withNotSalableRetention = $this->getConfig()->isNotSalableRetentionEnabled($storeId);
 
         if (!$this->getConfig()->isExportNotSalable($storeId) && !$withNotSalableRetention) {
             $collection->addFieldToFilter('salable', 1);
         }
+
         if (!$this->getConfig()->isExportSoldout($storeId) && !$withNotSalableRetention) {
             $collection->addFieldToFilter('is_in_stock', 1);
         }
+
         if ($this->getConfig()->isExportFilteredByAttribute($storeId)) {
             $collection->addFieldToFilter('is_in_flux', 1);
         }
@@ -127,10 +129,10 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
         $xmlStart = $xmlObject->startXml(
             array(
                 'size-exportable' => $sizeTotal,
-                'size-xml' => $collection->count(),
-                'with-out-of-stock' => intval($this->getConfig()->isExportSoldout()),
-                'with-not-salable' => intval($this->getConfig()->isExportNotSalable()),
-                'selected-only' => intval($this->getConfig()->isExportFilteredByAttribute()),
+                'size-xml' => $collection->getSize(),
+                'with-out-of-stock' => (int) $this->getConfig()->isExportSoldout(),
+                'with-not-salable' => (int) $this->getConfig()->isExportNotSalable(),
+                'selected-only' => (int) $this->getConfig()->isExportFilteredByAttribute(),
                 'visibilities' => implode(',', $visibilities),
             )
         );
@@ -218,7 +220,7 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
             && ($request instanceof Zend_Controller_Request_Http)
         ) {
             $postedProducts = $request->getParam('shoppingflux_category_products');
-            $storeId = intval($request->getParam('store', 0));
+            $storeId = (int) $request->getParam('store', 0);
 
             /** @var Profileolabs_Shoppingflux_Helper_String $stringHelper */
             $stringHelper = Mage::helper('profileolabs_shoppingflux/string');
@@ -431,6 +433,7 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
         if (!$this->getConfig()->isSyncEnabled()) {
             return;
         }
+
         if (($product = $observer->getEvent()->getData('product'))
             && ($product instanceof Mage_Catalog_Model_Product)
         ) {
@@ -481,6 +484,7 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
         if (!$this->getConfig()->isSyncEnabled()) {
             return;
         }
+
         if (($product = $observer->getEvent()->getData('product'))
             && ($product instanceof Mage_Catalog_Model_Product)
             && ($product->getStatus() != $product->getOrigData('status'))
@@ -517,6 +521,7 @@ class Profileolabs_Shoppingflux_Model_Export_Observer
             if (!$this->getConfig()->isSyncEnabled()) {
                 return;
             }
+
             if (!$observer->getEvent()->getData('shoppingflux_product')) {
                 $this->_scheduleProductUpdates($productId, array('stock_value' => 0));
             }

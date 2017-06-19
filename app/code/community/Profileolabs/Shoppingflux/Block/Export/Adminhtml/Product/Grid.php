@@ -120,6 +120,7 @@ class Profileolabs_Shoppingflux_Block_Export_Adminhtml_Product_Grid extends Mage
                 );
             }
         }
+
         return parent::_addColumnFilterToCollection($column);
     }
 

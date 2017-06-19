@@ -3,9 +3,9 @@
 if (Mage::helper('core')->isModuleEnabled('MDN_AdvancedStock')
     && class_exists('MDN_AdvancedStock_Model_CatalogInventory_Stock_Item')
 ) {
-    include_once(__DIR__ . '/Item/Compatibility/AdvancedStock.php');
+    include_once __DIR__ . '/Item/Compatibility/AdvancedStock.php';
 } else {
-    include_once(__DIR__ . '/Item/Compatibility/Default.php');
+    include_once __DIR__ . '/Item/Compatibility/Default.php';
 }
 
 class Profileolabs_Shoppingflux_Model_Export_Rewrite_CatalogInventory_Stock_Item extends Profileolabs_Shoppingflux_Model_Export_Rewrite_CatalogInventory_Stock_Item_Compatibility

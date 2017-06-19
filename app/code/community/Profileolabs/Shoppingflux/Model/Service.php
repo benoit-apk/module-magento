@@ -60,7 +60,7 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
      */
     public function getClient()
     {
-        if (is_null($this->_client)) {
+        if ($this->_client === null) {
             $config = array(
                 'curloptions' => array(
                     CURLOPT_SSL_VERIFYHOST => 0,
@@ -220,11 +220,13 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
         if ($trackingNumber && !preg_match('%^http%i', $trackingNumber)) {
             $xml .= '<TrackingNumber><![CDATA[' . $trackingNumber . ']]></TrackingNumber>';
         }
+
         if ($trackingUrl) {
             $xml .= '<TrackingUrl><![CDATA[' . $trackingUrl . ']]></TrackingUrl>';
         } else if ($trackingNumber && preg_match('%^http%i', $trackingNumber)) {
             $xml .= '<TrackingUrl><![CDATA[' . $trackingNumber . ']]></TrackingUrl>';
         }
+
         if ($trackingCarrier) {
             $xml .= '<CarrierName><![CDATA[' . $trackingCarrier . ']]></CarrierName>';
         }
@@ -271,10 +273,10 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
         if ($updates->getSize() <= 0) {
             return;
         }
-        
+
         $xml = '<?xml version="1.0" encoding="UTF-8"?>';
         $xml .= '<UpdateProduct>';
-        
+
         foreach ($updates as $update) {
             $xml .= '<Product>';
             $xml .= '<SKU>' . $update->getProductSku() . '</SKU>';
@@ -283,7 +285,7 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
             $xml .= '<OldPrice>' . $update->getOldPriceValue() . '</OldPrice>';
             $xml .= '</Product>';
         }
-        
+
         $xml .= '</UpdateProduct>';
         $this->_connect($this->_getApiKey(), self::METHOD_UPDATE_PRODUCT, $xml);
     }
@@ -294,9 +296,10 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
      */
     public function getLogin($apiKey = null)
     {
-        if (is_null($apiKey)) {
+        if ($apiKey === null) {
             $apiKey = $this->_getApiKey();
         }
+
         return $this->_connect($apiKey, self::METHOD_LOGIN);
     }
 
@@ -322,11 +325,13 @@ class Profileolabs_Shoppingflux_Model_Service extends Varien_Object
                     $config = Mage::getSingleton('core/config');
                     $config->saveConfig('shoppingflux/configuration/has_registered', 1);
                 }
+
                 return true;
             }
         } catch (Exception $e) {
             return ($e->getMessage() === 'API Key (Token) is empty');
         }
+
         return false;
     }
 }

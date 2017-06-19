@@ -9,7 +9,7 @@ class Profileolabs_Shoppingflux_Model_Attribute_Source_Category extends Mage_Eav
 
     public function getAllOptions($withEmpty = false)
     {
-        if (is_null($this->_options)) {
+        if ($this->_options === null) {
             $this->_options = array();
 
             /** @var Profileolabs_Shoppingflux_Helper_Data $helper */

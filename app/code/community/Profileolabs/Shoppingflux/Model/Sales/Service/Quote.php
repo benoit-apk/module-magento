@@ -19,7 +19,6 @@ class Profileolabs_Shoppingflux_Model_Sales_Service_Quote extends Mage_Sales_Mod
                     $helper->__('Please check shipping address information. %s', implode(' ', $addressValidation))
                 );
             }
-
         }
 
         $addressValidation = $this->getQuote()->getBillingAddress()->validate();
