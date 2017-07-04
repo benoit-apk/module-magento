@@ -48,7 +48,7 @@
             if(trElement) {
                 var checkbox = Element.getElementsBySelector(trElement, 'input');
                 
-                i f(checkbox[0]) {
+                if(checkbox[0]) {
                     var checked = isInput ? checkbox[0].checked : !checkbox[0].checked;
                     <?php echo $_gridJsObject ?>.setCheckboxChecked(checkbox[0], checked);
                 }
